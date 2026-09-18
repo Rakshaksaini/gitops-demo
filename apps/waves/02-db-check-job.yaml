@@ -5,6 +5,7 @@ metadata:
   namespace: default
   annotations:
     argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/sync-options: Replace=true,Force=true
 spec:
   backoffLimit: 2
   template:
