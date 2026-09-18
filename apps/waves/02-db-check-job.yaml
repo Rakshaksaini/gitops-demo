@@ -4,8 +4,6 @@ metadata:
   name: db-init-check
   namespace: default
   annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
     argocd.argoproj.io/sync-wave: "0"
 spec:
   template:
