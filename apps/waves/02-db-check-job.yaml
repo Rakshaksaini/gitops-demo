@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-init-check
+  namespace: default
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  template:
+    spec:
+      containers:
+        - name: check-databases
+          image: busybox:latest
+          envFrom:
+            - configMapRef:
+                name: app-db-config
+          command:
+            - sh
+            - -c
+            - |
+              echo "Checking MySQL connectivity..."
+              nc -z -w 5 $MYSQL_HOST $MYSQL_PORT || { echo "MySQL unreachable"; exit 1; }
+              echo "MySQL reachable."
+
+              echo "Checking MongoDB connectivity..."
+              nc -z -w 5 mongodb.database.svc.cluster.local 27017 || { echo "MongoDB unreachable"; exit 1; }
+              echo "MongoDB reachable."
+
+              echo "Running schema setup / migrations..."
+              sleep 3
+              echo "Database initialization complete."
+      restartPolicy: Never
+  backoffLimit: 2

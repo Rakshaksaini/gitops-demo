@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flask-app-config
+  namespace: default
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+data:
+  APP_VERSION: "v1.0"
+  MYSQL_HOST: "mysql-svc.database.svc.cluster.local"
+  MYSQL_USER: "root"
