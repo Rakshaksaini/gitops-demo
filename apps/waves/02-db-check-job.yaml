@@ -6,6 +6,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "0"
 spec:
+  backoffLimit: 2
   template:
     spec:
       containers:
@@ -13,21 +14,20 @@ spec:
           image: busybox:latest
           envFrom:
             - configMapRef:
-                name: app-db-config
+                name: flask-app-config
           command:
             - sh
             - -c
             - |
-              echo "Checking MySQL connectivity..."
-              nc -z -w 5 $MYSQL_HOST $MYSQL_PORT || { echo "MySQL unreachable"; exit 1; }
+              echo "Checking MySQL connectivity on $MYSQL_HOST:3306..."
+              nc -z -w 5 $MYSQL_HOST 3306 || { echo "MySQL unreachable"; exit 1; }
               echo "MySQL reachable."
 
-              echo "Checking MongoDB connectivity..."
-              nc -z -w 5 mongodb.database.svc.cluster.local 27017 || { echo "MongoDB unreachable"; exit 1; }
+              echo "Checking MongoDB connectivity on mongodb-svc.database.svc.cluster.local:27017..."
+              nc -z -w 5 mongodb-svc.database.svc.cluster.local 27017 || { echo "MongoDB unreachable"; exit 1; }
               echo "MongoDB reachable."
 
               echo "Running schema setup / migrations..."
               sleep 3
               echo "Database initialization complete."
       restartPolicy: Never
-  backoffLimit: 2
